@@ -3,7 +3,7 @@ import redis
 import os
 from dotenv import load_dotenv
 import json
-from tools import created_log_file,record_info
+from tools.file import created_log_file,record_info
 from datetime import datetime
 load_dotenv()
 
@@ -19,8 +19,15 @@ def on_message(mosq, obj, msg):
     redis_conn.rpush(topic,message)
     render_redis_conn.rpush(topic,message)
     # print(f"topic={topic},message:{message}")
-    message_dict = json.loads(s=memoryview)
-    print (message_dict)
+    
+    message_dict = json.loads(s=message)
+    print(message_dict)
+    #儲存檔案
+    now = datetime.now()
+    current_file_name = now.strftime('%Y_%m_%d.log')
+    log_path = created_log_file(current_file_name)
+    record_info(log_path=log_path,topic=message_dict['topic'],data=message_dict['data'],status=message_dict['status'])
+
 
 if __name__ == '__main__':
     
